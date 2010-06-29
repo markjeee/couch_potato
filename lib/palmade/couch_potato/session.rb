@@ -58,7 +58,7 @@ module Palmade::CouchPotato
 
         if defined?(MemCache) && @cache.is_a?(MemCache)
           self.extend(Palmade::CouchPotato::Mixins::SessionUseMemCache)
-        elsif defined?(DistRedis) && @cache.is_a?(DistRedis)
+        elsif defined?(Redis) && @cache.is_a?(Redis)
           self.extend(Palmade::CouchPotato::Mixins::SessionUseRedis)
         else
           raise UnsupportedCache, "Unsupported cache, supports only: memcache | redis"
@@ -393,6 +393,26 @@ module Palmade::CouchPotato
       { :session_user => @default_options[:session_user],
         :path => @default_options[:path],
         :domain => @default_options[:domain] }
+    end
+
+    def cache_add(k, rawsd, expiry = nil, raw = true)
+      raise "Not implemented"
+    end
+
+    def cache_set(k, rawsd, expiry = nil, raw = true)
+      raise "Not implemented"
+    end
+
+    def cache_get(k, raw = true)
+      raise "Not implemented"
+    end
+
+    def cache_fetch(k, expiry = nil, raw = true, &block)
+      raise "Not implemented"
+    end
+
+    def cache_delete(k)
+      raise "Not implemented"
     end
   end
 end

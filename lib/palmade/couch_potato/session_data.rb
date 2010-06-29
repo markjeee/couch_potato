@@ -85,7 +85,7 @@ module Palmade::CouchPotato
         parse_serialize_ready(sd_ready)
         @flash.sweep!
       else
-        @data = Palmade::Smash.new
+        @data = Hash.new
         @flash = Palmade::CouchPotato::SessionFlash.new
         @path = options[:path]
         @domain = options[:domain]

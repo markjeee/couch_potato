@@ -15,12 +15,12 @@ module Palmade::CouchPotato
     end
   end
 
-  class SessionFlash < Palmade::Smash
+  class SessionFlash < Hash
     attr_reader :used
 
     def initialize
       super
-      @used = Palmade::Smash.new
+      @used = Hash.new
     end
 
     def []=(k, v) #:nodoc:
