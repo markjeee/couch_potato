@@ -433,7 +433,11 @@ module Palmade::CouchPotato
     end
 
     def fix_encode(string)
-      string.force_encoding('BINARY').encode(Encoding::default_external)
+      if string.is_a?(String)
+        string.force_encoding('BINARY').encode(Encoding::default_external)
+      else
+        nil
+      end
     end
   end
 end
