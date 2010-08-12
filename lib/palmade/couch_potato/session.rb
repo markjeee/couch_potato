@@ -53,20 +53,25 @@ module Palmade::CouchPotato
     end
 
     def cache
-      if defined?(@cache)
-        @cache
-      else
-        @cache = Palmade::CouchPotato.sessions_cache
-
-        if defined?(MemCache) && @cache.is_a?(MemCache)
-          self.extend(Palmade::CouchPotato::Mixins::SessionUseMemCache)
-        elsif defined?(Redis) && @cache.is_a?(Redis)
-          self.extend(Palmade::CouchPotato::Mixins::SessionUseRedis)
+      begin
+        if defined?(@cache)
+          @cache
         else
-          raise UnsupportedCache, "Unsupported cache, supports only: memcache | redis"
-        end
+          @cache = Palmade::CouchPotato.sessions_cache
 
-        @cache
+          if defined?(MemCache) && @cache.is_a?(MemCache)
+            self.extend(Palmade::CouchPotato::Mixins::SessionUseMemCache)
+          elsif defined?(Redis) && @cache.is_a?(Redis)
+            self.extend(Palmade::CouchPotato::Mixins::SessionUseRedis)
+          else
+            raise UnsupportedCache, "Unsupported cache, supports only: memcache | redis"
+          end
+
+          @cache
+        end
+      rescue Exception => e
+        puts_warn(e)
+        raise
       end
     end
 
@@ -178,9 +183,15 @@ module Palmade::CouchPotato
       # load cache
       cache
 
-      sd = nil
-      unless sid.nil?
-        sd = get_sd(sid)
+
+      begin
+        sd = nil
+        unless sid.nil?
+          sd = get_sd(sid)
+        end
+      rescue Exception => e
+        sd = nil
+        puts_warn(e)
       end
 
       begin
@@ -205,7 +216,7 @@ module Palmade::CouchPotato
         warn $!.inspect
         return [ nil, nil ]
       rescue Exception => e
-        warn "ERROR: #{e.message}\n#{e.backtrace.join("\n")}"
+        puts_warn(e)
         raise
       ensure
         @mutex.unlock if env['rack.multithread']
@@ -294,7 +305,7 @@ module Palmade::CouchPotato
         warn $!.inspect
         return false
       rescue Exception => e
-        warn "ERROR: #{e.message}\n#{e.backtrace.join("\n")}"
+        puts_warn(e)
         raise
       ensure
         @mutex.unlock if env['rack.multithread']
@@ -355,7 +366,6 @@ module Palmade::CouchPotato
 
           if rawsd.include?(SD_DELIMETER)
             status, data = rawsd.split(SD_DELIMETER, 2)
-
             case status
             when "renewed"
               get_sd(data, raw)
@@ -367,7 +377,6 @@ module Palmade::CouchPotato
           end
         else
           revision_no, rawsd = rawsd.split(SD_DELIMETER, 2)
-
           unless raw
             deserialize_rawsd(sid, rawsd)
           else
@@ -417,6 +426,10 @@ module Palmade::CouchPotato
 
     def cache_delete(k)
       raise "Not implemented"
+    end
+
+    def puts_warn(e)
+      "ERROR: #{e} #{e.message}\n#{e.backtrace.join("\n")}"
     end
   end
 end
