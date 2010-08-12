@@ -429,7 +429,7 @@ module Palmade::CouchPotato
     end
 
     def puts_warn(e)
-      "ERROR: #{e} #{e.message}\n#{e.backtrace.join("\n")}"
+      warn "ERROR: #{e} #{e.message}\n#{e.backtrace.join("\n")}"
     end
   end
 end
