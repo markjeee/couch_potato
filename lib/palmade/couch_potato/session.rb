@@ -432,14 +432,8 @@ module Palmade::CouchPotato
       warn "ERROR: #{e} #{e.message}\n#{e.backtrace.join("\n")}"
     end
 
-    if defined?(Encoding)
-      def fix_encode(string)
-        string.force_encoding(Encoding::default_external)
-      end
-    else
-      def fix_encode(string)
-        string
-      end
+    def fix_encode(string)
+      string.force_encoding(Encoding::default_external).encode('UTF-8')
     end
   end
 end
