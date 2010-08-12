@@ -16,7 +16,7 @@ module Palmade::CouchPotato
       :cache_expire_after => 3600 # 1 hour
     }
 
-    SD_DELIMETER = "\0"
+    SD_DELIMETER = "|"
 
     attr_accessor :global
     alias :global? :global
@@ -346,7 +346,7 @@ module Palmade::CouchPotato
     end
 
     def get_sd(sid, raw = false)
-      rawsd = proper_encode(cache_get("#{cache_key}/#{sid}"))
+      rawsd = cache_get("#{cache_key}/#{sid}")
       unless rawsd.nil?
         if rawsd == "0"
           nil
@@ -355,6 +355,7 @@ module Palmade::CouchPotato
 
           if rawsd.include?(SD_DELIMETER)
             status, data = rawsd.split(SD_DELIMETER, 2)
+
             case status
             when "renewed"
               get_sd(data, raw)
@@ -366,6 +367,7 @@ module Palmade::CouchPotato
           end
         else
           revision_no, rawsd = rawsd.split(SD_DELIMETER, 2)
+
           unless raw
             deserialize_rawsd(sid, rawsd)
           else
@@ -415,16 +417,6 @@ module Palmade::CouchPotato
 
     def cache_delete(k)
       raise "Not implemented"
-    end
-
-    if "1.9".respond_to?(:encoding)
-      def proper_encode(s)
-        s.encode!('UTF-8')
-      end
-    else
-      def proper_encode(s)
-        s
-      end
     end
   end
 end
