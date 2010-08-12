@@ -34,7 +34,6 @@ module Palmade::CouchPotato
       # cache_fetch(x, x)
       def cache_fetch(k, expiry = nil, raw = true, &block)
         value = fix_encode(cache_get(k, raw))
-
         if value.nil? && block_given?
           value = yield
           cache_add(k, value, expiry, raw)
