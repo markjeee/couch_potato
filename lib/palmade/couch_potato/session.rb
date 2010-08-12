@@ -338,6 +338,9 @@ module Palmade::CouchPotato
         rawsd = "_#{sd}"
       end
 
+      # set the rawsd encoding to BINARY
+      rawsd = rawsd.force_encoding('BINARY')
+
       cache_add("#{cache_key}/#{sid}", rawsd, expiry)
     end
 
@@ -353,12 +356,19 @@ module Palmade::CouchPotato
       # update fragment expiry
       sd.set_fragment_expiry(expiry, old_sid)
 
+      # set the rawsd encoding to BINARY
+      rawsd = rawsd.force_encoding('BINARY')
+
       cache_set("#{cache_key}/#{sid}", rawsd, expiry)
     end
 
     def get_sd(sid, raw = false)
       rawsd = cache_get("#{cache_key}/#{sid}")
+
       unless rawsd.nil?
+        # set the rawsd encoding to BINARY
+        rawsd = rawsd.force_encoding('BINARY')
+
         if rawsd == "0"
           nil
         elsif rawsd[0,1] == '_'
@@ -430,14 +440,6 @@ module Palmade::CouchPotato
 
     def puts_warn(e)
       warn "ERROR: #{e} #{e.message}\n#{e.backtrace.join("\n")}"
-    end
-
-    def fix_encode(string)
-      if string.is_a?(String)
-        string.force_encoding('BINARY').encode(Encoding::default_external)
-      else
-        nil
-      end
     end
   end
 end

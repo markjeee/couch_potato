@@ -58,7 +58,6 @@ module Palmade::CouchPotato
       if !@user.nil? && @user.respond_to?(:before_serialize)
         @user.before_serialize
       end
-
       Marshal.dump(serialize_ready)
     end
 
