@@ -16,6 +16,8 @@ module Palmade::CouchPotato
       :cache_expire_after => 3600 # 1 hour
     }
 
+    SD_DELIMETER = "|"
+
     attr_accessor :global
     alias :global? :global
     def auto_create?; @default_options[:auto_create]; end
@@ -264,7 +266,7 @@ module Palmade::CouchPotato
 
             sd.increment_revision!
             set_sd(sid, sd, expiry, old_sid) # let's save ourselves
-            set_sd(old_sid, "renewed\0#{sid}", 5) # let's update the other one, to point to us
+            set_sd(old_sid, "renewed#{SD_DELIMETER}#{sid}", 5) # let's update the other one, to point to us
           end
         else
           # TODO: when doing an incremental merge, perhaps, there's
@@ -318,7 +320,7 @@ module Palmade::CouchPotato
 
     def add_sd(sid, sd, expiry = nil)
       if sd.is_a?(Palmade::CouchPotato::SessionData)
-        rawsd = "#{sd.revision_no}\0#{sd.serialize}"
+        rawsd = "#{sd.revision_no}#{SD_DELIMETER}#{sd.serialize}"
       elsif sd == 0
         rawsd = "0"
       else
@@ -330,7 +332,7 @@ module Palmade::CouchPotato
 
     def set_sd(sid, sd, expiry = nil, old_sid = nil)
       if sd.is_a?(Palmade::CouchPotato::SessionData)
-        rawsd = "#{sd.revision_no}\0#{sd.serialize}"
+        rawsd = "#{sd.revision_no}#{SD_DELIMETER}#{sd.serialize}"
       elsif sd == 0
         rawsd = "0"
       else
@@ -351,8 +353,8 @@ module Palmade::CouchPotato
         elsif rawsd[0,1] == '_'
           rawsd = rawsd[1..-1]
 
-          if rawsd.include?("\0")
-            status, data = rawsd.split("\0", 2)
+          if rawsd.include?(SD_DELIMETER)
+            status, data = rawsd.split(SD_DELIMETER, 2)
             case status
             when "renewed"
               get_sd(data, raw)
@@ -363,7 +365,7 @@ module Palmade::CouchPotato
             rawsd
           end
         else
-          revision_no, rawsd = rawsd.split("\0", 2)
+          revision_no, rawsd = rawsd.split(SD_DELIMETER, 2)
           unless raw
             deserialize_rawsd(sid, rawsd)
           else
