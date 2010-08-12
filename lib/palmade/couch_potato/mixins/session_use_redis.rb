@@ -23,7 +23,7 @@ module Palmade::CouchPotato
 
       # cache_get("sessions/#{sid}", true)
       def cache_get(k, raw = true)
-        rawsd = @cache.get(k)
+        rawsd = fix_encode(@cache.get(k))
         unless rawsd.nil?
           raw ? rawsd : Marshal.load(rawsd)
         else
@@ -33,7 +33,7 @@ module Palmade::CouchPotato
 
       # cache_fetch(x, x)
       def cache_fetch(k, expiry = nil, raw = true, &block)
-        value = cache_get(k, raw)
+        value = fix_encode(cache_get(k, raw))
 
         if value.nil? && block_given?
           value = yield
