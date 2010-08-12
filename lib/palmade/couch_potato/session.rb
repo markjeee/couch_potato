@@ -16,7 +16,7 @@ module Palmade::CouchPotato
       :cache_expire_after => 3600 # 1 hour
     }
 
-    SD_DELIMETER = "|"
+    SD_DELIMETER = "\0"
 
     attr_accessor :global
     alias :global? :global
