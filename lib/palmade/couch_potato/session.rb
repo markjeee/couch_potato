@@ -346,7 +346,7 @@ module Palmade::CouchPotato
     end
 
     def get_sd(sid, raw = false)
-      rawsd = cache_get("#{cache_key}/#{sid}")
+      rawsd = proper_encode(cache_get("#{cache_key}/#{sid}"))
       unless rawsd.nil?
         if rawsd == "0"
           nil
@@ -415,6 +415,16 @@ module Palmade::CouchPotato
 
     def cache_delete(k)
       raise "Not implemented"
+    end
+
+    if "1.9".respond_to?(:encoding)
+      def proper_encode(s)
+        s.encode!('UTF-8')
+      end
+    else
+      def proper_encode(s)
+        s
+      end
     end
   end
 end
