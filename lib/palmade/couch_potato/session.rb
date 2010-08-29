@@ -1,3 +1,5 @@
+# -*- encoding: binary -*-
+
 require 'rack'
 require 'rack/session/abstract/id'
 
@@ -339,7 +341,9 @@ module Palmade::CouchPotato
       end
 
       # set the rawsd encoding to BINARY
-      rawsd = rawsd.force_encoding('BINARY')
+      if rawsd.respond_to?(:force_encoding)
+        rawsd = rawsd.force_encoding('BINARY')
+      end
 
       cache_add("#{cache_key}/#{sid}", rawsd, expiry)
     end
@@ -357,7 +361,9 @@ module Palmade::CouchPotato
       sd.set_fragment_expiry(expiry, old_sid)
 
       # set the rawsd encoding to BINARY
-      rawsd = rawsd.force_encoding('BINARY')
+      if rawsd.respond_to?(:force_encoding)
+        rawsd = rawsd.force_encoding('BINARY')
+      end
 
       cache_set("#{cache_key}/#{sid}", rawsd, expiry)
     end
@@ -367,7 +373,9 @@ module Palmade::CouchPotato
 
       unless rawsd.nil?
         # set the rawsd encoding to BINARY
-        rawsd = rawsd.force_encoding('BINARY')
+        if rawsd.respond_to?(:force_encoding)
+          rawsd = rawsd.force_encoding('BINARY')
+        end
 
         if rawsd == "0"
           nil
